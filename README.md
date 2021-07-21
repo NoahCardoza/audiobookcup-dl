@@ -4,6 +4,8 @@ At the moment this is just a **simple** script to download audio books easily fr
 
 ## Usage
 
+Using Python 3.9, running this script is as easy as:
+
 ```bash
 python main.py "<url>"
 ```
