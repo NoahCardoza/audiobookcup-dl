@@ -33,7 +33,8 @@
     </footer>
     <script>
       const { createApp, ref, h, computed} = Vue;
-      
+      const API_BASE = 'https://audiobookcup-dl.herokuapp.com'
+
       const App = {
         setup() {
           const url = ref('');
@@ -60,7 +61,7 @@
           const downloadAudiobook = async () => {
             isDownloading.value = true
 
-            const response = await fetch(`http://127.0.0.1:5000/${url.value}`)
+            const response = await fetch(`${API_BASE}/${url.value}`)
 
             if (!response.ok) {
               throw Error(response.status+' '+response.statusText)
