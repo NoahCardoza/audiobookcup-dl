@@ -1,3 +1,4 @@
+import traceback
 from base64 import b64decode
 
 import requests
@@ -47,6 +48,7 @@ def catch_all(audiobook_page_url):
             'Access-Control-Expose-Headers': 'x-filename'
         }, mimetype=audiobook_file_res.headers['content-type'])
     except Exception:
+        traceback.print_exc()
         return jsonify({
             'message': 'An unknown error has occured. Contact MacHacker#8396 on Discord.'
         }), 500
