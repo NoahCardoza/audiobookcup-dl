@@ -24,9 +24,13 @@ def catch_all(audiobook_page_url):
 
         audiobook_page_res = s.get(audiobook_page_url)
         
+        
         html = audiobook_page_res.text
         
         book_title = html.split('<title>')[1].split('</title>')[0]
+        print(html)
+        print(book_title)
+        print(audiobook_page_res)
         
         encrypted_url = html.split('encrypt:')[1].split("',")[0]
         decoded_url = b64decode(encrypted_url).decode()
