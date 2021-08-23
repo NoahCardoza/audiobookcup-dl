@@ -1,13 +1,19 @@
 import traceback
 from base64 import b64decode
+from os import environ
 
 import requests
 from flask import Flask, Response, jsonify
 from flask_cors import CORS
+from requests.sessions import session
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
+
+proxies = {
+    'https': environ['HTTPS_PROXY']
+} if 'HTTPS_PROXY' in environ else None
 
 @app.route('/<path:audiobook_page_url>', )
 def catch_all(audiobook_page_url):
@@ -22,15 +28,11 @@ def catch_all(audiobook_page_url):
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
         })
 
-        audiobook_page_res = s.get(audiobook_page_url)
-        
+        audiobook_page_res = s.get(audiobook_page_url, proxies=proxies)
         
         html = audiobook_page_res.text
         
         book_title = html.split('<title>')[1].split('</title>')[0]
-        print(html)
-        print(book_title)
-        print(audiobook_page_res)
         
         encrypted_url = html.split('encrypt:')[1].split("',")[0]
         decoded_url = b64decode(encrypted_url).decode()
