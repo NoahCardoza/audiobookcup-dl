@@ -1,26 +1,34 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AudiobookCup | Download</title>
     <script src="https://unpkg.com/vue@next"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <script src="https://kit.fontawesome.com/09dc678054.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js" integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
   </head>
   <body>
     <section class="app-parent section">
-        <div class="container">
-          <h1 class="title">AudiobookCup Downloader</h1>
-          <div id="app"></div>
-        </div>
-      </section>
+      <div class="container">
+        <h1 class="title">AudiobookCup Downloader</h1>
+        <div id="app"></div>
+      </div>
+    </section>
+    <footer>
+      <div>
+          Made with ❤️ &nbsp; by <a href='https://github.com/NoahCardoza'
+              target='_blank'>@NoahCardoza</a>
+      </div>
+      <iframe class="iframe-stars" src='https://ghbtns.com/github-btn.html?user=NoahCardoza&repo=audiobookcup-dl&type=star&count=true' width='90' height='20' title='GitHub'></iframe>
+    </footer>
     <script>
       const { createApp, ref, h, computed} = Vue;
       
       const App = {
         setup() {
-          const url = ref('https://www.audiobookcup.com/the-final-boss-trapped-in-a-video-game-book-5-audiobook/');
+          const url = ref('');
           const isDownloading = ref(false);
           const progress = ref(null);
 
@@ -187,6 +195,16 @@
 
       .progress {
         margin-top: 2rem;
+      }
+      
+      footer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .iframe-stars {
+        margin-left: 0.5rem;
       }
     </style>
   </body>
