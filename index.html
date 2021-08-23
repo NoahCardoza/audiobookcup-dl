@@ -39,7 +39,20 @@
         setup() {
           const url = ref('');
           const isDownloading = ref(false);
+          const isHerokuOnline = ref(false);
+          const downloadButtonToolTipMessage = ref(null);
           const progress = ref(null);
+          
+
+          const pingHeroku = async () => {
+            downloadButtonToolTipMessage.value = 'Awakening the API...'
+            const req = await fetch(`${API_BASE}/ping`)
+            const { message } = await req.json()
+            if (message == 'pong') {
+              isHerokuOnline.value = true
+            }
+            downloadButtonToolTipMessage.value = null
+          }
 
           const canSubmitForDownload = computed(() => {
             return url.value.includes('://www.audiobookcup.com')
@@ -86,7 +99,6 @@
               new ReadableStream({
                 start(controller) {
                   const reader = response.body.getReader();
-
                   read();
                   function read() {
                     reader.read()
@@ -118,6 +130,51 @@
             url.value = ''
           }
           
+          const DownloadButton = () => {
+            const button = h(
+              'button',
+              {
+                class: [
+                  'button',
+                  !isHerokuOnline.value || isDownloading.value ? 'is-loading' : null,
+                  buttonClassState.value,
+                ],
+                title: 'Download',
+                disabled: !isHerokuOnline.value || isDownloading.value || !canSubmitForDownload.value,
+                onClick: downloadAudiobook
+              },
+              [
+                h(
+                  'i',
+                  {
+                    className: 'fas fa-file-download'
+                  }
+                )
+              ]
+            )
+            if (downloadButtonToolTipMessage.value !== null) {
+              return h(
+                'div',
+                {
+                  className: 'tooltip',
+                },
+                [
+                  h(
+                    'span', 
+                    {
+                      className: 'tooltiptext',
+                    },
+                    downloadButtonToolTipMessage.value
+                  ),
+                  button
+                ]
+              )
+            }
+            return button
+          }
+
+          pingHeroku()
+
           return () => h(
             'div',
             null,
@@ -139,8 +196,8 @@
                       ],
                       disabled: isDownloading.value,
                       autofocus: 'true',
-                      type: "text",
-                      placeholder:"Audiobook URL",
+                      type: 'text',
+                      placeholder:'Audiobook URL',
                       value: url.value,
                       onInput: (e) => url.value = e.target.value,
                     },
@@ -148,40 +205,20 @@
                       name.value
                     ]
                   ),
-                  h(
-                    'button',
-                    {
-                      class: [
-                        'button',
-                        isDownloading.value ? 'is-loading' : null,
-                        buttonClassState.value,
-                      ],
-                      title: 'Download',
-                      disabled: isDownloading.value || !canSubmitForDownload.value,
-                      onClick: downloadAudiobook
-                    },
-                    [
-                      h(
-                        'i',
-                        {
-                          className: 'fas fa-file-download'
-                        }
-                      )
-                    ]
-                  )
+                  DownloadButton()
                 ]
-                )
-              ],
-              isDownloading.value && h(
-                'progress',
-                {
-                  className: 'progress is-success',
-                  value: progress.value,
-                  max: '100'
-                }, 
-                `${progress.value}%`
               )
-            );
+            ],
+            isDownloading.value && h(
+              'progress',
+              {
+                className: 'progress is-success',
+                value: progress.value,
+                max: '100'
+              }, 
+              `${progress.value}%`
+            )
+          );
         },
       };
 
@@ -215,6 +252,48 @@
       .iframe-stars {
         margin-left: 0.5rem;
       }
+
+
+
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 2px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+
+    width: 120px;
+    bottom: 130%;
+    left: 50%;
+    margin-left: -60px;
+
+  }
+
+  .tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+  }
     </style>
   </body>
 </html>
