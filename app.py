@@ -5,7 +5,6 @@ from os import environ
 import requests
 from flask import Flask, Response, jsonify
 from flask_cors import CORS
-from requests.sessions import session
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
