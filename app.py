@@ -15,7 +15,13 @@ proxies = {
     'https': environ['HTTPS_PROXY']
 } if 'HTTPS_PROXY' in environ else None
 
-@app.route('/<path:audiobook_page_url>', )
+@app.route('/ping')
+def ping():
+    return jsonify({
+        'message': 'pong'
+    }), 200
+
+@app.route('/<path:audiobook_page_url>')
 def catch_all(audiobook_page_url):
     try:
         if '://www.audiobookcup.com/' not in audiobook_page_url:
