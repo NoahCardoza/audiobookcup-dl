@@ -1,0 +1,193 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AudiobookCup | Download</title>
+    <script src="https://unpkg.com/vue@next"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <script src="https://kit.fontawesome.com/09dc678054.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js" integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    <section class="app-parent section">
+        <div class="container">
+          <h1 class="title">AudiobookCup Downloader</h1>
+          <div id="app"></div>
+        </div>
+      </section>
+    <script>
+      const { createApp, ref, h, computed} = Vue;
+      
+      const App = {
+        setup() {
+          const url = ref('https://www.audiobookcup.com/the-final-boss-trapped-in-a-video-game-book-5-audiobook/');
+          const isDownloading = ref(false);
+          const progress = ref(null);
+
+          const canSubmitForDownload = computed(() => {
+            return url.value.includes('://www.audiobookcup.com')
+          })  
+
+          const inputClassState = computed(() => {
+            if (!url.value) return null
+            return canSubmitForDownload.value ? 'is-success' : 'is-danger'
+          })
+          
+          const buttonClassState = computed(() => {
+            if (!url.value) return null
+            return canSubmitForDownload.value ? 'is-success' : null
+          })
+          
+          const elProgress = document.getElementById('progress');
+
+
+          const downloadAudiobook = async () => {
+            isDownloading.value = true
+
+            const response = await fetch(`http://127.0.0.1:5000/${url.value}`)
+
+            if (!response.ok) {
+              throw Error(response.status+' '+response.statusText)
+            }
+
+            if (!response.body) {
+              throw Error('ReadableStream not yet supported in this browser.')
+            }
+
+            const contentEncoding = response.headers.get('content-encoding');
+            const contentLength = response.headers.get('content-length');
+            
+            if (contentLength === null) {
+              throw Error('Response size header unavailable');
+            }
+
+            const total = parseInt(contentLength, 10);
+            let totalRead = 0;
+    
+
+            const audioResponse = await new Response(
+              new ReadableStream({
+                start(controller) {
+                  const reader = response.body.getReader();
+
+                  read();
+                  function read() {
+                    reader.read()
+                      .then(({done, value}) => {
+                        if (done) {
+                          controller.close();
+                          return; 
+                        }
+                        totalRead += value.byteLength;
+                        progress.value = Math.round((totalRead / total) * 100)
+                        controller.enqueue(value);
+                        read();
+                      })
+                      .catch(error => {
+                        console.error(error);
+                        controller.error(error)                  
+                      })
+                  }
+                }
+              })
+            );
+            
+            const blob = await audioResponse.blob();
+
+            download(blob, response.headers.get('x-filename'), contentEncoding)
+            
+            isDownloading.value = false
+            progress.value = null
+            url.value = ''
+          }
+          
+          return () => h(
+            'div',
+            null,
+            [
+              h(
+                'div',
+                {
+                  className: 'input-box'
+                },
+                [
+                  h(
+                    'input',
+                    {
+                      class: [
+                        'input',
+                        'input-download',
+                        isDownloading.value ? 'is-loading' : null,
+                        inputClassState.value
+                      ],
+                      disabled: isDownloading.value,
+                      autofocus: 'true',
+                      type: "text",
+                      placeholder:"Audiobook URL",
+                      value: url.value,
+                      onInput: (e) => url.value = e.target.value,
+                    },
+                    [
+                      name.value
+                    ]
+                  ),
+                  h(
+                    'button',
+                    {
+                      class: [
+                        'button',
+                        isDownloading.value ? 'is-loading' : null,
+                        buttonClassState.value,
+                      ],
+                      title: 'Download',
+                      disabled: isDownloading.value || !canSubmitForDownload.value,
+                      onClick: downloadAudiobook
+                    },
+                    [
+                      h(
+                        'i',
+                        {
+                          className: 'fas fa-file-download'
+                        }
+                      )
+                    ]
+                  )
+                ]
+                )
+              ],
+              isDownloading.value && h(
+                'progress',
+                {
+                  className: 'progress is-success',
+                  value: progress.value,
+                  max: '100'
+                }, 
+                `${progress.value}%`
+              )
+            );
+        },
+      };
+
+      createApp(App).mount("#app");
+    </script>
+    <style>
+      .app-parent {
+        margin: 0 auto;
+        width: 80%;
+        max-width: 800px;
+        min-width: 400px;
+      }
+      .input-box {
+        display: flex;
+        justify-content: space-between;
+      }
+      .input-download {
+        margin-right: 1rem;
+      }
+
+      .progress {
+        margin-top: 2rem;
+      }
+    </style>
+  </body>
+</html>
