@@ -56,7 +56,7 @@
 
           const canSubmitForDownload = computed(() => {
             return url.value.includes('://www.audiobookcup.com')
-          })  
+          })
 
           const inputClassState = computed(() => {
             if (!url.value) return null
@@ -72,6 +72,7 @@
 
 
           const downloadAudiobook = async () => {
+            gtag('send', 'event', 'App', 'download', url.value)
             isDownloading.value = true
 
             const response = await fetch(`${API_BASE}/${url.value}`)
