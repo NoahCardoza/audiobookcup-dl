@@ -49,14 +49,17 @@ def catch_all(audiobook_page_url):
         file_postfix = decoded_url.rsplit('.', maxsplit=1)[1]
         
         def generate():
-            for chunk in audiobook_file_res.iter_content(chunk_size=1024): 
+            for chunk in audiobook_file_res.iter_content(chunk_size=4096): 
                     if chunk:
                         yield chunk
         
+        filename = f'{book_title}.{file_postfix}'
+        
         return Response(generate(), headers={
-            'x-filename': f'{book_title}.{file_postfix}',
+            'X-Filename': filename,
             'Content-Length': audiobook_file_res.headers['Content-Length'],
-            'Access-Control-Expose-Headers': 'x-filename'
+            'Access-Control-Expose-Headers': 'X-Filename',
+            'Content-Disposition': f'attachment; filename="{filename}"',
         }, mimetype=audiobook_file_res.headers['content-type'])
     except Exception:
         traceback.print_exc()

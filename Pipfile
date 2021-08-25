@@ -7,7 +7,7 @@ name = "pypi"
 flask = "*"
 requests = "*"
 flask-cors = "*"
-gunicorn = "*"
+waitress = "*"
 
 [dev-packages]
 
