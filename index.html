@@ -72,7 +72,13 @@
 
 
           const downloadAudiobook = async () => {
-            gtag('send', 'event', 'App', 'download', url.value)
+            gtag('event', 'form_submit', {
+                event_category: 'Forms',
+                event_action: 'Submit',
+                event_label: 'Download',
+                event_value: url.value,
+            });
+            
             isDownloading.value = true
 
             const response = await fetch(`${API_BASE}/${url.value}`)
