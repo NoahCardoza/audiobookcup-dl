@@ -74,9 +74,8 @@
           const downloadAudiobook = async () => {
             gtag('event', 'form_submit', {
                 event_category: 'Forms',
-                event_action: 'Submit',
-                event_label: 'Download',
-                event_value: url.value,
+                event_action: 'Download',
+                event_label: (new URL(url.value)).pathname,
             });
             
             isDownloading.value = true
