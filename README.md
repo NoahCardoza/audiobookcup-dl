@@ -1,3 +1,7 @@
+## NOTICE
+
+* (12/22) As heroku has recently removed support for free tier instances the API has been permanently taken offline.
+
 # audiobookcup-dl
 
 While this started as a simple CLI tool to download audiobooks easily from audiobookcup.com,
